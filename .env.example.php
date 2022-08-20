@@ -71,12 +71,11 @@ return [
     'EMAIL_OVERRIDE_TO' => false, // if set to an email address and EMAIL_SEND is true, all emails will only be sent to this email address
 
     // OAuth Services
-    'SERVICE_URL' => 'https://api.github.com',
-    'SERVICE_URL_AUTHORIZE' => 'https://service.example.net/login/oauth/authorize',
-    'SERVICE_URL_REDIRECT' => 'http://example.com/oauth/redirect',
-    'SERVICE_URL_TOKEN' => 'https://service.example.net/login/oauth/access_token',
-    'SERVICE_CLIENT_ID' => 'api_id',
-    'SERVICE_CLIENT_SECRET' => 'api_secret',
-    'SERVICE_USER_AGENT' => 'some_services_require_this_item', 
+    'TWITTER_URL' => 'https://api.twitter.com',
+    'TWITTER_URL_AUTHORIZE' => 'https://twitter.com/i/oauth2/authorize',
+    'TWITTER_URL_REDIRECT' => 'http://example.com/twitter/redirect',
+    'TWITTER_URL_TOKEN' => 'https://api.twitter.com/2/oauth2/token',
+    'TWITTER_CLIENT_ID' => 'YOUR_OAUTH2_CLIENT_ID',
+    'TWITTER_CLIENT_SECRET' => 'YOUR_OAUTH2_CLIENT_SECRET',
 ];
 
