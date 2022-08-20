@@ -10,8 +10,7 @@ Required tools:
 Not required tools:
 * There are no dependencies so composer is not needed for this install.
 
-```
-Get started (put it anywhere on your system, I'm putting it in the home directory)
+Get started (put it anywhere on your system, you could put it in your home directory)
 ```
 cd ~
 ```
