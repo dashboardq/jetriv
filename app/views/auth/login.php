@@ -1,13 +1,10 @@
 <!DOCTYPE html>                
 <html>
     <head>                     
-                <meta charset="utf-8">     
+        <meta charset="utf-8">     
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-        <title>Home</title>
-
-        <link href="/assets/css/ao.css?cache-date=2022-07-15" rel="stylesheet">
-        <link href="/assets/css/main.css?cache-date=2022-07-15" rel="stylesheet">
+        <?php $res->partial('head'); ?>
     </head>
     <body class="timeline page_login">
         <div class="base">
@@ -81,6 +78,7 @@
                 <form id="logout" action="/logout" method="POST" class="hidden"></form>
         
         <script src="/assets/js/ao.js?cache-date=2022-07-15"></script>
+        <script src="/assets/js/_ao.js?cache-date=2022-07-15"></script>
         <script src="/assets/js/main.js?cache-date=2022-07-15"></script>
 
                             </div>

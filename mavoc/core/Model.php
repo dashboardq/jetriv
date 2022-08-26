@@ -230,7 +230,7 @@ class Model {
         $this->data = ao()->hook('ao_model_save_' . $this->tbl . '_data', $this->data);
     }
 
-    public function update($input) {
+    public function update($input = []) {
         $items = [];
         $items['updated_at'] = new DateTime();
 
@@ -297,6 +297,11 @@ class Model {
                         $count++;
                     }
                 }
+
+                // TODO: This is dangerous and needs to be cleaned up - only pass trusted data.
+                if(isset($class::$limit)) {
+                    $sql .= ' LIMIT ' . $class::$limit;
+                }
                 $data = ao()->db->query($sql, $values);
             } else {
                 $sql = 'SELECT * FROM ' . $table . ' WHERE ' . $key . ' = ?';
@@ -313,6 +318,11 @@ class Model {
                         $count++;
                     }       
                 }       
+
+                // TODO: This is dangerous and needs to be cleaned up - only pass trusted data.
+                if(isset($class::$limit)) {
+                    $sql .= ' LIMIT ' . $class::$limit;
+                }
                 $data = ao()->db->query($sql, $value);
             }
             foreach($data as $item) {
@@ -328,18 +338,29 @@ class Model {
         return $output;
     }
 
-    public static function whereIn($key, $list = [], $return_type = 'all') {
+    public static function whereIn($key, $list = [], $and = [], $return_type = 'all') {
         $class = get_called_class();
         $table = $class::$table;
         $output = [];
-        if($table) {
+        $values = [];
+        if($table && count($list)) {
             $sql = 'SELECT * FROM ' . $table . ' WHERE `' . $key . '` IN (';
             foreach($list as $item) {
                 $sql .= '?,';
+                $values[] = $item;
             }
             $sql = trim($sql, ',');
             $sql .= ')';
-            $data = ao()->db->query($sql, $list);
+
+            if(count($and)) {
+                foreach($and as $k => $v) {
+                    $sql .= ' AND ' . $k . ' = ?';
+                    $values[] = $v;
+                }
+            }
+
+            //$data = ao()->db->query($sql, $list);
+            $data = ao()->db->query($sql, $values);
 
             foreach($data as $item) {
                 if($return_type == 'data') {

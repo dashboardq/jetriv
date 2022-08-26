@@ -91,7 +91,7 @@ class Router {
                 if(!$match && strpos($route, '{') !== false) {
                     //echo preg_replace('|{[^}/]*}|', '[a-zA-Z0-9]*', $trimmed_route);die;
                     // This is a bit complicated. Turning the route into a regex then checking against the path.
-                    $match = preg_match('|^' . preg_replace('|{[^}/]*}|', '[a-zA-Z0-9-]*', $trimmed_route) . '$|', $trimmed_path);
+                    $match = preg_match('|^' . preg_replace('|{[^}/]*}|', '[a-zA-Z0-9_-]*', $trimmed_route) . '$|', $trimmed_path);
                     if($match) {
                         $req->params = $this->parseParams($trimmed_route, $trimmed_path);
                     }

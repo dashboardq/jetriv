@@ -10,8 +10,16 @@
             </div>
         </footer>
 
-        <div class="overlay -processing" hidden>
+        <div class="overlay processing" hidden>
             <div class="loading"><span></span></div>
+        </div>
+
+        <div class="overlay message" hidden>
+            <div class="box">
+                <h2>Error</h2>
+                <div class="content"></div>
+                <button aria-label="Close">&times;</button>
+            </div>
         </div>
 
         <?php if($user): ?>
@@ -19,6 +27,7 @@
         <?php endif; ?>
 
         <script src="/assets/js/ao.js?cache-date=<?php esc($cache_date); ?>"></script>
+        <script src="/assets/js/_ao.js?cache-date=<?php esc($cache_date); ?>"></script>
         <script src="/assets/js/main.js?cache-date=<?php esc($cache_date); ?>"></script>
 
         <?php if(ao()->env('APP_ENV') == 'prod'): ?>

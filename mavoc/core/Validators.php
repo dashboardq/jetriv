@@ -268,4 +268,7 @@ class Validators {
         return $output;
     }
 
+    public function sometimes($input, $field) {
+        return true;
+    }   
 }

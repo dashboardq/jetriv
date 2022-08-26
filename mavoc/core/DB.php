@@ -36,6 +36,17 @@ class DB {
         }
     }
 
+    public function array($input) {
+        $output = [];
+        foreach($input as $row) {
+            foreach($row as $key => $value) {
+                $output[] = $value;
+            }
+        }
+
+        return $output;
+    }
+
     public function call($args, $type = PDO::FETCH_ASSOC) {
         $args_count = count($args);
         $output = [];

@@ -10,13 +10,16 @@
             <main>
                 <div class="box">
                     <form class="search">
-                        <input type="text" name="q" value="<?php esc($query['q']); ?>" placeholder="Search bookmarks..." />
+                        <input type="text" name="q" value="<?php esc($query['q']); ?>" placeholder="Search todos..." />
                         <input type="submit" value="Search" />
                     </form>
 
                     <?php foreach($list as $i => $item): ?>
                     <?php $res->partial('tweet', compact('item')); ?>
                     <?php endforeach; ?>
+                    <div class="pagination">
+                        <a href="#" class="button">Next Page &gt;</a>
+                    </div>
                 </div>
             </main>
             <?php $res->partial('cycles'); ?>

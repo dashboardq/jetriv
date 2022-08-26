@@ -97,7 +97,7 @@ footer {
     border-top: 1px solid #e0e0e0;
 }
 
-.page_home main .box {
+.timeline main .box {
     margin: 0;
     height: 100%;
     padding: 1rem !important;
@@ -140,6 +140,12 @@ footer {
 .timeline main .box {
     padding: 0;
 }
+
+.timeline textarea {
+    max-width: 100%;
+    height: 80px;
+}
+
 article {
     margin-bottom: 1rem;
     padding: 1rem;
@@ -246,11 +252,103 @@ article ul.tools {
     margin-bottom: 0;
 }
 
-article .notes {
+article .edit {
+    display: none;
+    margin-top: 1rem;
+}
+article.bookmark_active ._bookmark {
+    opacity: 0.5;
+}
+article.bookmark_active .bookmark .edit {
+    display: block;
+}
+article.bookmark_active .bookmark .view {
+    display: none;
+}
+article.todo_active ._todo {
+    opacity: 0.5;
+}
+article.todo_active .todo .edit {
+    display: block;
+}
+article.todo_active .todo .view {
+    display: none;
+}
+article.interact_active ._interact {
+    opacity: 0.5;
+}
+article.interact_active .interact .edit {
+    display: block;
+}
+article.interact_active .interact .view {
+    display: none;
+}
+
+article .edit {
+    position: relative;
+}
+article .view:not(:empty) {
+    position: relative;
     margin-top: 1rem;
 	padding: 1rem;
     background: #f8f8f8;
+
+	padding: 1rem;
+	padding-top: 2.5rem;
 }
+article .edit:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 4px 8px;
+    background: #d6d6d6;
+}
+article .view:not(:empty):before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 4px 8px;
+    background: #d6d6d6;
+}
+article .view p:empty {
+    display: none;
+}
+article .bookmark .edit:before {
+    content: 'bookmark';
+}
+article .bookmark .view:not(:empty):before {
+    content: 'bookmark';
+}
+article .todo .edit:before {
+    content: 'todo';
+}
+article .todo .view:not(:empty):before {
+    content: 'todo';
+}
+article .interact .edit:before {
+    content: 'interact';
+}
+article .edit textarea {
+    padding-top: 3rem;
+    height: 120px;
+}
+article .edit button {
+    background: transparent;
+    color: inherit;
+    text-decoration: underline;
+}
+article button[aria-label=Close] {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: #d6d6d6;
+    padding: 4px;
+    width: 30px;
+    color: inherit;
+}
+
 /* EOF Timeline */
 
 .logo {
@@ -326,8 +424,13 @@ article .notes {
 }
 
 .pagination {
+    position: relative;
     text-align: right;
-    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+}
+.pagination a.next:only-child {
+    margin-left: auto;
 }
 
 .-small {

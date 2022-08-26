@@ -25,9 +25,9 @@ class TwitterService {
     public $connection;
 
     public $timeline_args = [
-        'expansions' => 'author_id,attachments.media_keys',
-        'media.fields' => 'url',
-        'tweet.fields' => 'attachments,created_at,public_metrics',
+        'expansions' => 'author_id,attachments.media_keys,in_reply_to_user_id,referenced_tweets.id,referenced_tweets.id.author_id',
+        'media.fields' => 'preview_image_url,url',
+        'tweet.fields' => 'attachments,conversation_id,created_at,entities,public_metrics,referenced_tweets',
         'user.fields' => 'verified,profile_image_url',
 
         // Only load 20 to keep the response times quick.
@@ -48,35 +48,104 @@ class TwitterService {
         $this->url_base = ao()->env('TWITTER_URL');
     }
 
-    public function bookmarks() {
+    public function bookmarks($pagination_token = '') {
         $twitter_id = $this->twitter_id;
 
         $url = '/2/users/' . $twitter_id . '/bookmarks';
         $url .= '?' . http_build_query($this->timeline_args);
+        if($pagination_token) {
+            $url .= '&' . http_build_query(['pagination_token' => $pagination_token]);
+        }
 
-        $data = self::get($url);
+        $data = $this->get($url);
+
+        //echo '<pre>'; print_r($data);
 
         $list = $this->processTimeline($data);
 
-        //echo '<pre>'; print_r($data);
         //echo '<pre>'; print_r($list);
         //die;
         
         return $list;
     }
 
+    public function bookmarkCreate($tweet_id) {
+        $twitter_id = $this->twitter_id;
 
-    public function home() {
+        $headers = ['Content-Type: application/json'];
+ 
+        $data = [];
+        $data['tweet_id'] = $tweet_id;
+        $data = json_encode($data);
+
+        $url = '/2/users/' . $twitter_id . '/bookmarks';
+        $response = $this->post($url, $data, $headers);
+
+        return $response;
+    }
+
+    public function following($twitter_id = null, $out_limit = 100, $sort_by = null, $direction = 'asc') {
+        if(!$twitter_id) {
+            $twitter_id = $this->twitter_id;
+        }
+        
+        $args = [];
+        $args['user.fields'] = 'public_metrics';
+        $args['max_results'] = 1000;
+
+        $url = '/2/users/' . urlencode($twitter_id) . '/following';
+        $url .= '?' . http_build_query($args);
+        $response = $this->get($url);
+
+        $output = [];
+        foreach($response->data ?? [] as $item) {
+            $values = [];
+            $values['id'] = $item->id;
+            $values['name'] = $item->name;
+            $values['username'] = $item->username;
+            $values['followers_count'] = $item->public_metrics->followers_count;
+            $values['following_count'] = $item->public_metrics->following_count;
+            $values['tweet_count'] = $item->public_metrics->tweet_count;
+            $values['listed_count'] = $item->public_metrics->listed_count;
+            $output[] = $values;
+        }
+
+        if($sort_by) {
+			// Create sort array that matches order of the $output array and then sort $output array by $sort array
+			$sort = [];
+			foreach($output as $item) {
+				$sort[] = $item[$sort_by];
+			}
+
+            if($direction == 'desc') {
+                array_multisort($sort, SORT_DESC, $output);
+            } else {
+                array_multisort($sort, SORT_ASC, $output);
+            }
+        }
+
+        if($out_limit) {
+            $output = array_slice($output, 0, $out_limit);
+        }
+
+        return $output;
+    }
+
+    public function home($pagination_token = '') {
         $twitter_id = $this->twitter_id;
 
         $url = '/2/users/' . $twitter_id . '/timelines/reverse_chronological';
         $url .= '?' . http_build_query($this->timeline_args);
+        if($pagination_token) {
+            $url .= '&' . http_build_query(['pagination_token' => $pagination_token]);
+        }
 
-        $data = self::get($url);
+        $data = $this->get($url);
+
+        //echo '<pre>'; print_r($data);
 
         $list = $this->processTimeline($data);
 
-        //echo '<pre>'; print_r($data);
         //echo '<pre>'; print_r($list);
         //die;
         
@@ -84,6 +153,26 @@ class TwitterService {
     }
 
     public function me() {
+    }
+
+    public function notifications($pagination_token = '') {
+        $twitter_id = $this->twitter_id;
+
+        $url = '/2/users/' . $twitter_id . '/mentions';
+        $url .= '?' . http_build_query($this->timeline_args);
+        if($pagination_token) {
+            $url .= '&' . http_build_query(['pagination_token' => $pagination_token]);
+        }
+
+        $data = $this->get($url);
+
+        $list = $this->processTimeline($data);
+
+        //echo '<pre>'; print_r($data);
+        //echo '<pre>'; print_r($list);
+        //die;
+        
+        return $list;
     }
 
     public function get($url) {
@@ -97,12 +186,30 @@ class TwitterService {
         return $output;
     }
 
+    public function post($url, $data, $headers) {
+        $url = $this->url_base . $url;
+        $output = $this->rest->post($url, $data, $headers);
+
+        if(isset($output->status) && $output->status == 401) {
+            $this->refresh();
+            $output = $this->post($url, $data, $headers);
+        }
+        return $output;
+    }
+
     public function processTimeline($data) {
         $list = [];
+
+        //echo '<pre>'; print_r($data); echo '</pre>';
 
         foreach($data->data ?? [] as $i => $item) {
             $list[] = $item;
             $list[$i]->created = new DateTime($item->created_at);
+            preg_match('|(.*)(https://t.co/[a-zA-Z0-9]+)$|s', $item->text, $matches);
+            if(count($matches)) {
+                $list[$i]->text = $matches[1];
+                $list[$i]->last_link = $matches[2];
+            }
         }
 
         $users = [];
@@ -111,8 +218,13 @@ class TwitterService {
         }
 
         $media = [];
-        foreach($data->includes->media ?? [] as $item) {
-            $media[$item->media_key] = $item;
+        foreach($data->includes->media ?? [] as $medi) {
+            $media[$medi->media_key] = $medi;
+        }
+
+        $tweets = [];
+        foreach($data->includes->tweets ?? [] as $twee) {
+            $tweets[$twee->id] = $twee;
         }
 
 
@@ -124,7 +236,76 @@ class TwitterService {
                     $list[$i]->media[] = $media[$key];
                 }
             }
+
+            if(isset($item->referenced_tweets) && count($item->referenced_tweets)) {
+                if($item->referenced_tweets[0]->type == 'retweeted') {
+                    $list[$i]->author = $users[$tweets[$item->referenced_tweets[0]->id]->author_id];
+                    $list[$i]->text = $tweets[$item->referenced_tweets[0]->id]->text;
+                }
+            }
         }
+
+        if(isset($data->meta->previous_token) && count($list)) {
+            $list[count($list) - 1]->previous_token = http_build_query(['pagination_token' => $data->meta->previous_token]);
+        }
+        if(isset($data->meta->next_token) && count($list)) {
+            $list[count($list) - 1]->next_token = http_build_query(['pagination_token' => $data->meta->next_token]);
+        }
+        //echo '<pre>'; print_r($list); echo '</pre>';
+        //die;
+
+        return $list;
+    }
+
+    public function processTweetTimeline($tweet_data, $data) {
+        $list = $this->processTimeline($data);
+
+        //echo '<pre>'; print_r($tweet_data);
+        //die;
+
+
+        if(isset($tweet_data->data)) {
+            $item = $tweet_data->data;
+            $item->created = new DateTime($item->created_at);
+            preg_match('|(.*)(https://t.co/[a-zA-Z0-9]+)$|s', $item->text, $matches);
+            if(count($matches)) {
+                $item->text = $matches[1];
+                $item->last_link = $matches[2];
+            }
+
+            $users = [];
+            foreach($tweet_data->includes->users ?? [] as $user) {
+                $users[$user->id] = $user;
+            }
+
+            $media = [];
+            foreach($tweet_data->includes->media ?? [] as $medi) {
+                $media[$medi->media_key] = $medi;
+            }
+
+            $tweets = [];
+            foreach($tweet_data->includes->tweets ?? [] as $twee) {
+                $tweets[$twee->id] = $twee;
+            }
+
+            $item->author = $users[$item->author_id];
+            $item->media = [];
+            if(isset($item->attachments->media_keys)) {
+                foreach($item->attachments->media_keys as $j => $key) {
+                    $item->media[] = $media[$key];
+                }
+            }
+
+            if(isset($item->referenced_tweets) && count($item->referenced_tweets)) {
+                if($item->referenced_tweets[0]->type == 'retweeted') {
+                    $item->author = $users[$tweets[$item->referenced_tweets[0]->id]->author_id];
+                    $item->text = $tweets[$item->referenced_tweets[0]->id]->text;
+                }
+            }
+
+            array_unshift($list, $item);
+        }
+
 
         return $list;
     }
@@ -172,10 +353,95 @@ class TwitterService {
         $this->profile->data['twitter_username'] = $response->data->username;
         $this->profile->save();
 
-        $this->connection->data['user_id'] = $req->user_id;
+        $this->connection->data['user_id'] = $this->twitter_id;
         $this->connection->data['twitter_id'] = $response->data->id;
         $this->connection->data['data'] = $access;
         $this->connection->data['encrypted'] = 0;
         $this->connection->save();
+    }
+
+    public function tweets($ids) {
+        $args = $this->timeline_args;
+        unset($args['max_results']);
+        $url = '/2/tweets';
+        $url .= '?' . http_build_query($args);
+        $url .= '&' . 'ids=' . implode(',', $ids);
+
+        $data = $this->get($url);
+        //echo '<pre>'; print_r($data); echo '</pre>'; die;
+
+        $list = $this->processTimeline($data);
+
+        //echo '<pre>'; print_r($data);
+        //echo '<pre>'; print_r($list);
+        //die;
+
+        return $list;
+    }
+
+    public function tweetTimeline($tweet_id, $pagination_token = '') {
+        $args = $this->timeline_args;
+        unset($args['max_results']);
+        $url = '/2/tweets/' . $tweet_id;
+        $url .= '?' . http_build_query($args);
+
+        $tweet_data = $this->get($url);
+
+
+        $args = $this->timeline_args;
+        unset($args['max_results']);
+        $url = '/2/tweets/search/recent';
+        $url .= '?' . http_build_query($args);
+        $url .= '&' . 'query=in_reply_to_tweet_id:' . $tweet_id;
+        if($pagination_token) {
+            $url .= '&' . http_build_query(['pagination_token' => $pagination_token]);
+        }
+
+        $data = $this->get($url);
+
+        //echo '<pre>'; print_r($data);
+
+        $list = $this->processTweetTimeline($tweet_data, $data);
+
+        //echo '<pre>'; print_r($list);
+        //die;
+
+        return $list;
+    }
+
+    public function userLookup($username) {
+        $args = [];
+        $args['expansions'] = 'pinned_tweet_id';
+        $args['user.fields'] = 'created_at,description,entities,location,id,profile_image_url,protected,public_metrics,url';
+
+        $url = '/2/users/by/username/' . urlencode($username);
+        $url .= '?' . http_build_query($args);
+        $response = $this->get($url);
+
+        //echo '<pre>'; print_r($response); echo '</pre>'; die;
+        return $response;
+    }
+
+    public function userTimeline($username, $pagination_token = '') {
+        $response = $this->userLookup($username);
+        //echo '<pre>'; print_r($response); echo '</pre>'; die;
+
+        $url = '/2/users/' . $response->data->id . '/tweets';
+        $url .= '?' . http_build_query($this->timeline_args);
+        $url .= '&' . 'exclude=replies';
+        if($pagination_token) {
+            $url .= '&' . http_build_query(['pagination_token' => $pagination_token]);
+        }
+
+        $data = $this->get($url);
+        
+        //echo '<pre>'; print_r($data);
+
+        $list = $this->processTimeline($data);
+
+        //echo '<pre>'; print_r($list);
+        //die;
+
+        return $list;
     }
 }

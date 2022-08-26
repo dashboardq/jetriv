@@ -75,7 +75,11 @@ class Validate {
                             $messages[$item][] = $this->rules->message($rule, $input, wordify($item));
                         }
                     } else {
-                        $this->fields[$item] = $input[$item];
+                        if(isset($input[$item])) {
+                            $this->fields[$item] = $input[$item];
+                        } else {
+                            $this->fields[$item] = '';
+                        }
                     }
                 } elseif(is_array($rule) && in_array($key, $methods)) {
                     $args = $rule[$key];

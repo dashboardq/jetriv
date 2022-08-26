@@ -9,10 +9,12 @@
             <?php $res->partial('sidebar'); ?>
             <main>
                 <div class="box">
+                    <?php /*
                     <form class="search">
-                        <input type="text" name="q" value="<?php esc($query['q']); ?>" placeholder="Search bookmarks..." />
+                        <input type="text" name="q" value="<?php esc($query['q']); ?>" placeholder="Search notifications..." />
                         <input type="submit" value="Search" />
                     </form>
+                     */ ?>
 
                     <?php foreach($list as $i => $item): ?>
                     <?php $res->partial('tweet', compact('item')); ?>

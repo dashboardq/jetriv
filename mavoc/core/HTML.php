@@ -70,7 +70,7 @@ class HTML {
     public function _messages() {
         $output = '';
         if(isset($this->session->flash['error'])) {
-            $output .= '<div class="notice -error">';
+            $output .= '<div class="notice error">';
             $output .= "\n";
             foreach($this->session->flash['error'] as $field => $messages) {
                 foreach($messages as $message) {
@@ -82,7 +82,7 @@ class HTML {
             $output .= "\n";
         }
         if(isset($this->session->flash['success'])) {
-            $output .= '<div class="notice -success">';
+            $output .= '<div class="notice success">';
             $output .= "\n";
             foreach($this->session->flash['success'] as $field => $messages) {
                 foreach($messages as $message) {

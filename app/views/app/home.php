@@ -15,6 +15,8 @@
                     </form>
 
                     <?php foreach($list as $item): ?>
+                    <?php $res->partial('tweet', compact('item')); ?>
+                    <?php /*
                     <article data-id="<?php esc($item->id); ?>">
                         <a href="/<?php esc($item->author->username); ?>"><img src="<?php esc($item->author->profile_image_url); ?>" alt="Profile Image" /></a>
                         <ul class="meta">
@@ -56,12 +58,8 @@
                             <li><button class="interact">Interact</button></li>
                         </ul>
                     </article>
+                     */ ?>
                     <?php endforeach; ?>
-                    <?php if(count($list)): ?>
-                    <div class="pagination">
-                        <a href="/tour1" class="button">Next Page &gt;</a>
-                    </div>
-                    <?php endif; ?>
                 </div>
             </main>
             <?php if(!$show_connect): ?>

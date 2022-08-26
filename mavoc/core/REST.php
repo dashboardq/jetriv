@@ -159,6 +159,9 @@ class REST {
     public function post($url, $data = [], $headers = [], $as_array = false) {
         $final_headers = array_merge($this->headers, $headers);
 
+        //echo '<pre>'; print_r($headers); echo '</pre>';
+        //echo '<pre>'; print_r($final_headers); echo '</pre>'; die;
+
         $ch = curl_init();
 
         curl_setopt($ch, CURLOPT_URL, $url);
