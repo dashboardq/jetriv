@@ -26,7 +26,6 @@ class Response {
     }
 
     public function error($message, $redirect = null) {
-        echo '<pre>'; print_r($message);die;
         if(isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest') {
             $output = [];
             $output['status'] = 'error';
