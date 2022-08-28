@@ -24,7 +24,9 @@ Route::get('twitter/start', ['TwitterController', 'start'], 'private');
 Route::get('twitter/redirect', ['TwitterController', 'redirect'], 'private');
 
 Route::post('ajax/bookmark/add', ['AjaxController', 'bookmarkCreate'], 'private');
+Route::post('ajax/interact/add', ['AjaxController', 'interactCreate'], 'private');
 Route::post('ajax/todo/add', ['AjaxController', 'todoCreate'], 'private');
+Route::post('ajax/like/add', ['AjaxController', 'likeCreate'], 'private');
 
 Route::get('account', ['AuthController', 'account'], 'private');
 Route::post('account', ['AuthController', 'accountPost'], 'private');

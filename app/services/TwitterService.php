@@ -152,6 +152,21 @@ class TwitterService {
         return $list;
     }
 
+    public function like($tweet_id) {
+        $twitter_id = $this->twitter_id;
+
+        $headers = ['Content-Type: application/json'];
+ 
+        $data = [];
+        $data['tweet_id'] = $tweet_id;
+        $data = json_encode($data);
+
+        $url = '/2/users/' . $twitter_id . '/likes';
+        $response = $this->post($url, $data, $headers);
+
+        return $response;
+    }
+
     public function me() {
     }
 
@@ -173,6 +188,23 @@ class TwitterService {
         //die;
         
         return $list;
+    }
+
+    public function replyCreate($tweet_id, $text) {
+        $twitter_id = $this->twitter_id;
+
+        $headers = ['Content-Type: application/json'];
+ 
+        $data = [];
+        $data['text'] = $text;
+        $data['reply'] = [];
+        $data['reply']['in_reply_to_tweet_id'] = $tweet_id;
+        $data = json_encode($data);
+
+        $url = '/2/tweets';
+        $response = $this->post($url, $data, $headers);
+
+        return $response;
     }
 
     public function get($url) {

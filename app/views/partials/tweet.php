@@ -37,7 +37,14 @@
                             </div>
                         </dl>
                         <ul class="tools">
-                            <li><button class="_like">Like</button></li>
+                            <li>
+                                <form action="/ajax/like/add" class="_like" method="POST">
+                                    <fieldset>
+                                        <?php $res->html->hidden('tweet_id', $item->id); ?>
+                                        <input type="submit" value="Like" />
+                                    </fieldset>
+                                </form>
+                            </li>
                             <li><button class="_todo">Todo</button></li>
                             <li><button class="_bookmark">Bookmark</button></li>
                             <li><button class="_interact">Interact</button></li>
@@ -78,14 +85,11 @@
                         </div>
 
                         <div class="interact _part">
-                            <form action="/ajax/interact" class="edit" method="POST">
+                            <form action="/ajax/interact/add" class="edit" method="POST">
                                 <fieldset>
                                     <?php $res->html->hidden('tweet_id', $item->id); ?>
-                                    <?php $res->html->hidden('tweet_name', $item->author->name); ?>
-                                    <?php $res->html->hidden('tweet_username', $item->author->username); ?>
-                                    <?php $res->html->hidden('tweet_content', $item->text); ?>
                                     <textarea name="note" placeholder="Enter your reply..."></textarea>
-                                    <input type="submit" value="Send" />
+                                    <input type="submit" value="Reply" />
                                     <button class="_cancel">Cancel</button>
                                 </fieldset>
                             </form>

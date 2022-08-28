@@ -73,6 +73,53 @@ class AjaxController {
         $res->view('ajax/bookmark-view', compact('item', 'note'));
     }
 
+    public function interactCreate($req, $res) {
+        $val = $req->val('data', [
+            'tweet_id' => ['required'],
+            'note' => ['required'],
+        ]);
+
+        $twitter = new TwitterService($req->user_id);
+        $response = $twitter->replyCreate($val['tweet_id'], $val['note']);
+
+        if(isset($response->errors)) {
+            $messages = [];
+            foreach($response->errors as $error) {
+                $messages[] = $error->message;
+            }
+
+            $res->error($messages);
+        }
+
+        $item = [];
+        $item['tweet_id'] = $val['tweet_id'];
+
+        $res->view('ajax/interact-view', compact('item'));
+    }
+
+    public function likeCreate($req, $res) {
+        $val = $req->val('data', [
+            'tweet_id' => ['required'],
+        ]);
+
+        $twitter = new TwitterService($req->user_id);
+        $response = $twitter->like($val['tweet_id']);
+
+        if(isset($response->errors)) {
+            $messages = [];
+            foreach($response->errors as $error) {
+                $messages[] = $error->message;
+            }
+
+            $res->error($messages);
+        }
+
+        // TODO: Update so that you can pass this as success (like you can with error).
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode(['status' => 'success']);
+        exit;
+    }
+
     public function todoCreate($req, $res) {
         $val = $req->val('data', [
             'tweet_id' => ['required'],

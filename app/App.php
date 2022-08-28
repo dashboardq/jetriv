@@ -15,7 +15,7 @@ class App {
     public function cacheDate($vars, $args) {
         $view = $args[0];
         if($view == 'head' || $view == 'footer') {
-            $vars['cache_date'] = '2022-07-15';
+            $vars['cache_date'] = '2022-08-15';
         }
 
         return $vars;

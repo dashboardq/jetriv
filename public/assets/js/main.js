@@ -46,6 +46,8 @@
     function init() {
         ao.listen('click', 'article .tools button', clickTool);
         ao.listen('click', 'article .edit ._cancel', closeTool, resetTool);
+
+        ao.listen('success', 'article ._like', _ao.empty);
         
         ao.listen('success', 'article .edit', _ao._toggleSuffixClosest('_active'), _ao._closest('._part'));
     }

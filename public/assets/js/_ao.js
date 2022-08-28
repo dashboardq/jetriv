@@ -149,6 +149,8 @@ window._ao = {};
         return output;
     };
 
+    _ao.empty = function() {};
+
     _ao.submit = function($form) {
         if($form instanceof Event) {
             var e = $form;
