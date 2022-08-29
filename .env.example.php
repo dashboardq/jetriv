@@ -26,7 +26,7 @@ return [
     'APP_TERMS_UPDATED' => 'July 15, 2022',
 
     // Only used for simple, non-database sites.
-    'APP_LOGIN_TYPE' => 'list', // Options: list, db
+    'APP_LOGIN_TYPE' => 'db', // Options: list, db
     // The number is the user_id.
     'APP_LOGIN_USERS' => [
         1 => ['email' => 'user@example.com', 'password' => 'example'],
