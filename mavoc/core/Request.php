@@ -7,6 +7,7 @@ use mavoc\core\Validate;
 
 class Request {
     public $data = [];
+    public $ip = ''; 
     public $method = '';
     public $query = [];
     public $last_url = '/'; 
@@ -30,6 +31,7 @@ class Request {
 
     public function init() {
         $this->method = $_SERVER['REQUEST_METHOD'] ?? '';
+        $this->ip = $_SERVER['REMOTE_ADDR'] ?? '';
 
         if(isset($_SERVER['REQUEST_URI'])) {
             $this->path = urldecode(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));

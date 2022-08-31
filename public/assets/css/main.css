@@ -125,6 +125,10 @@ footer {
 
     display: flex;
     justify-content: space-evenly;
+    flex-wrap: wrap;
+}
+.page_login main .full {
+    flex-basis: 100%;
 }
 .page_login .cycles {
     display: none;
@@ -168,6 +172,9 @@ article a {
 article a:hover {
     text-decoration: underline;
 }
+article a:hover span {
+    text-decoration: underline;
+}
 
 article ul {
     margin: 0;
@@ -178,6 +185,22 @@ article ul {
 }
 article li {
     display: inline-block;
+}
+
+article .retweeted_by {
+    position: absolute;
+    top: -10px;
+    font-weight: bold;
+    left: 70px;
+}
+
+article .retweeted_by span {
+    display: inline-block;
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: bottom;
 }
 
 article .author_name {
@@ -211,6 +234,7 @@ article .post {
 }
 
 article .media {
+    margin-top: 1rem;
     margin-bottom: 1rem;
 }
 
@@ -437,4 +461,24 @@ article button[aria-label=Close] {
     padding: .5rem;
     padding: 7px;
     font-size: 14px;
+}
+
+.quoted {
+    position: relative;
+    margin-top: .5rem;
+    padding: .5rem;
+    border: 1px solid #e0e0e0;
+}
+
+.quoted > a {
+    position: absolute;
+    left: .5rem;
+}
+.quoted > a > img {
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+}
+.quoted .meta {
+    padding-left: calc(20px + .5rem);
 }

@@ -87,14 +87,23 @@ class Model {
                 $sql = 'SELECT * FROM ' . $table . ' WHERE ';
                 $values = [];
                 foreach($key as $k => $v) {
-                    if($first) {
-                        $sql .= $k . ' = ?';
-                        $values[] = $v;
-                        $first = false;
+                    if(!$first) {
+                        $sql .= ' AND ';
+                    }
+
+                    if(is_array($v) && count($v) == 2) {
+                        if(strtoupper($v[1]) == 'NOW()') {
+                            $sql .= '`' . $k . '` ' . $v[0] . ' NOW()';
+                        } else {
+                            $sql .= '`' . $k . '` ' . $v[0] . ' ?';
+                            $values[] = $v;
+                        }
                     } else {
-                        $sql .= ' AND ' . $k . ' = ?';
+                        $sql .= '`' . $k . '` = ?';
                         $values[] = $v;
                     }
+
+                    $first = false;
                 }
                 $sql .= ' LIMIT 1';
                 $data = ao()->db->query($sql, $values);
@@ -261,6 +270,57 @@ class Model {
         $args[] = $this->id;
 
         //$this->db->query($sql, $args);
+        ao()->db->query($sql, $args);
+    }
+
+    public static function updateWhere($input = [], $key = '', $value = '') {
+        $class = get_called_class();
+        $items = [];
+        $items['updated_at'] = new DateTime();
+
+        $input = array_merge($items, $input);
+
+        // If columns are set, make sure only those are used.
+        // TODO: Make clmns static
+        //if(count($class::$clmns)) {
+            //$input = array_intersect_key($input, array_flip($this->clmns));
+        //}
+
+        // Make sure to include created_at and updated_at
+        $sql = 'UPDATE ' . $class::$table . ' SET ';
+        $args = [];
+        foreach($input as $k => $v) {
+            // Prep data (like converting DateTime to string
+            if($v instanceof DateTime) {
+                $v = $v->format('Y-m-d H:i:s');
+            }
+
+            if(count($args) > 0) {
+                $sql .= ', ';
+            }
+            $sql .= '`' . $k . '`' . ' = ?';
+            $args[] = $v;
+        }
+        if($key && $value) {
+            $sql .= ' WHERE `' . $key . '` = ?';
+            $args[] = $value;
+        } elseif(is_array($key)) {
+            $first = true;
+            $sql .= ' WHERE ';
+            foreach($key as $k => $v) {
+                if($first) {
+                    $sql .= '`' . $k . '` = ?';
+                    $args[] = $v;
+                    $first = false;
+                } else {
+                    $sql .= ' AND `' . $k . '` = ?';
+                    $args[] = $v;
+                }
+            }
+        }
+
+        //echo '<pre>'; print_r($args);die;
+        //echo $sql;die;
         ao()->db->query($sql, $args);
     }
 

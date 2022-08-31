@@ -23,7 +23,9 @@
         <div class="sidebar">
         </div>
             <main>
-                <?php $res->html->messages(); ?>
+                <section class="full">
+                    <?php $res->html->messages(); ?>
+                </section>
 
                 <section class="login">
                     <h2>Login</h2>

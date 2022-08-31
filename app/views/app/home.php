@@ -9,10 +9,13 @@
             <?php $res->partial('sidebar'); ?>
             <main>
                 <div class="box">
+                    <?php /*
                     <form class="search">
                         <input type="text" name="q" value="" placeholder="Search" />
                         <input type="submit" value="Search" />
                     </form>
+                     */ ?>
+                    <?php $res->html->messages(); ?>
 
                     <?php foreach($list as $item): ?>
                     <?php $res->partial('tweet', compact('item')); ?>
@@ -72,6 +75,12 @@
                     <?php $res->html->messages(); ?>
                     <p>Please connect your Twitter account by pressing the button below:</p>
                     <p><a href="/twitter/start" class="button">Connect To Twitter</a></p>
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                    <p>If you do not want to connect to Twitter, you can logout below:</p>
+                    <p><a href="#" class="button" onclick="event.preventDefault(); document.getElementById('logout').submit();">Logout</a></p>
                 </div>
             </div>
             <?php endif; ?>

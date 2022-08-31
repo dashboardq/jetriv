@@ -66,10 +66,16 @@ class Validators {
         $input = $args[0];
         $field = $args[1];
         $table = $args[2];
+        $field_name = $args[3];
         $value = $input[$field];
 
-        // UNSAFE: Be careful
-        $results = ao()->db->query('SELECT * FROM ' . $table . ' WHERE ' . $field . ' = ? LIMIT 1', $value);
+        if($field_name) {
+            // UNSAFE: Be careful
+            $results = ao()->db->query('SELECT * FROM ' . $table . ' WHERE ' . $field_name . ' = ? LIMIT 1', $value);
+        } else {
+            // UNSAFE: Be careful
+            $results = ao()->db->query('SELECT * FROM ' . $table . ' WHERE ' . $field . ' = ? LIMIT 1', $value);
+        }
 
         if(count($results) == 0) {
             return false;

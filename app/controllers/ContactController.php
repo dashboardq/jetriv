@@ -25,4 +25,8 @@ class ContactController {
 
         $res->success('Thank you for contacting us.');
     }
+
+    public function support($req, $res) {
+        $res->redirect('/contact');
+    }
 }

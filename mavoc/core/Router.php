@@ -156,7 +156,7 @@ class Router {
                             // Dynamically pick the view file.
                             if($vars || is_array($vars)) {
                                 $view_dir = underscorify(str_replace('Controller', '', $class_name));
-                                $res->view($view_dir . '/' . $method_name, $vars);
+                                $res->view($view_dir . '/' . dashify($method_name), $vars);
                             }
                         }
 
@@ -229,7 +229,7 @@ class Router {
                                 // Dynamically pick the view file.
                                 if($vars || is_array($vars)) {
                                     $view_dir = underscorify(str_replace('Controller', '', $class_name));
-                                    $res->view($view_dir . '/' . $method_name, $vars);
+                                    $res->view($view_dir . '/' . dashify($method_name), $vars);
                                 }
                             }
 
@@ -294,7 +294,7 @@ class Router {
                                 // Dynamically pick the view file.
                                 if($vars || is_array($vars)) {
                                     $view_dir = underscorify(str_replace('Controller', '', $class_name));
-                                    $res->view($view_dir . '/' . $method_name, $vars);
+                                    $res->view($view_dir . '/' . dashify($method_name), $vars);
                                 }
                             }
 

@@ -10,7 +10,7 @@ class AuthController {
         $res->fields['name'] = $req->user->data['name'];
         $res->fields['email'] = $req->user->data['email'];
 
-        return ['title' => 'Account'];
+        return ['title' => 'Account', 'show_connect' => false];
     }
 
     public function accountPost($req, $res) {
@@ -26,6 +26,41 @@ class AuthController {
 
         $res->success('Account has been updated.');
     }
+
+    public function changePassword($req, $res) {
+        return ['title' => 'Change Password', 'show_connect' => false];
+    }   
+
+    public function changePasswordPost($req, $res) {
+        if(ao()->env('APP_LOGIN_TYPE') != 'db') {
+            $res->error('There was a problem processing the requested action.');
+        }   
+        $val = $req->val('data', [
+            'old_password' => ['required'],
+            'new_password' => ['required', 'password'],
+        ]); 
+
+        $req->user->changePassword($val['old_password'], $val['new_password']);
+
+        $res->success('Account has been updated.', '/account');
+    } 
+
+    public function forgotPassword($req, $res) {
+        return ['title' => 'Forgot Password'];
+    }   
+
+    public function forgotPasswordPost($req, $res) {
+        if(ao()->env('APP_LOGIN_TYPE') != 'db') {
+            $res->error('There was a problem processing the requested action.');
+        }   
+        $val = $req->val('data', [
+            'email' => ['required'],
+        ]); 
+
+        User::forgotPassword($val['email']);
+
+        $res->success('If the email address matches an account on the system, you should receive an email with further instructions.', '/forgot-password');    
+    }  
 
     public function login($req, $res) {
         return ['title' => 'Login'];
@@ -94,4 +129,31 @@ class AuthController {
 
         $res->redirect(ao()->env('APP_PRIVATE_HOME'));
     }
+
+	public function resetPassword($req, $res) {
+		$title = 'Reset Password';
+		$val = $req->val('query', [
+			'id' => ['required', 'int'],
+			'reset' => ['required'],
+		]);
+
+		$user_id = $val['id'];
+		$token = $val['reset'];
+		return compact('title', 'token', 'user_id');
+	}
+
+	public function resetPasswordPost($req, $res) {
+		if(ao()->env('APP_LOGIN_TYPE') != 'db') {
+			$res->error('There was a problem processing the requested action.');
+		}
+		$val = $req->val('data', [
+			'user_id' => ['required'],
+			'token' => ['required'],
+			'new_password' => ['required', 'password'],
+		]);
+
+		User::resetPassword($val['user_id'], $val['token'], $val['new_password']);
+
+		$res->success('The password should now be updated. Please try logging in.', '/login');
+	}
 }

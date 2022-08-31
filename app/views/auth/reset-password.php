@@ -3,7 +3,7 @@
     <head>                     
         <?php $res->partial('head'); ?>
     </head>
-    <body>
+    <body class="<?php $res->pathClass(); ?>">
         <div class="base">
             <header class="app">
                 <div class="box">
@@ -21,20 +21,19 @@
             </div>
             <main>
                 <section class="box">
-                    <h1>Contact</h1>
-
-                    <p>If you have any questions, problems, or concerns about anything, please do not hesitate to make contact.</p> 
                     <?php $res->html->messages(); ?>
 
-                    <form method="POST">
-                        <?php $res->html->text('Name'); ?>
+                    <section class="reset_password">
+                        <h2><?php esc($title); ?></h2>
+                        <form method="POST">
+                            <?php $res->html->hidden('user_id', $user_id); ?>
+                            <?php $res->html->hidden('token', $token); ?>
 
-                        <?php $res->html->text('Email'); ?>
+                            <?php $res->html->password('New Password'); ?>
 
-                        <?php $res->html->textarea('Message'); ?>
-
-                        <?php $res->html->submit('Send', 'button button_invert'); ?>
-                    </form>
+                            <?php $res->html->submit('Submit'); ?>
+                        </form>
+                    </section>
 
                 </section>
             </main>

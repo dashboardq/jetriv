@@ -98,6 +98,8 @@ window._ao = {};
     };
     */
 
+    _ao.empty = function() {};
+
     _ao.error = function(messages, title) {
         var content = '';
         var e;
@@ -148,8 +150,6 @@ window._ao = {};
         var output = input.replace(/(\r\n|\n\r|\r|\n)/g, '<br>');
         return output;
     };
-
-    _ao.empty = function() {};
 
     _ao.submit = function($form) {
         if($form instanceof Event) {

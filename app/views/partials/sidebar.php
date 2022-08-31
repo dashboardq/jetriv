@@ -16,6 +16,10 @@
                         <li><a href="/todo">Todo</a></li>
                         <li><a href="/notifications">Notifications</a></li>
                         <li><a href="/bookmarks">Bookmarks</a></li>
+                        <li><a href="/account">Account</a></li>
+<?php /*
+                        <li><a href="/support">Support</a></li>
+ */ ?>
                         <li><a href="#" onclick="event.preventDefault(); document.getElementById('logout').submit();">Logout</a></li>
                     </ul>
                 </nav>

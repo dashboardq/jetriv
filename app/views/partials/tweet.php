@@ -1,22 +1,40 @@
                     <article data-id="<?php esc($item->id); ?>">
                         <a href="/<?php esc($item->author->username); ?>"><img src="<?php esc($item->author->profile_image_url); ?>" alt="Profile Image" /></a>
                         <ul class="meta">
+                            <?php if($item->retweeted_tweet): ?>
+                            <li class="retweeted_by"><a href="/<?php esc($item->retweeter->username); ?>"><span><?php esc($item->retweeter->name); ?></span> Retweeted</a></li>
+                            <?php endif; ?>
                             <li class="author_name"><a href="/<?php esc($item->author->username); ?>"><?php esc($item->author->name); ?></a></li>
                             <li class="author_username"><a href="/<?php esc($item->author->username); ?>">@<?php esc($item->author->username); ?></a></li>
-                            <li class="post_created_at"><a href="/<?php esc($item->author->username . '/status/' . $item->id); ?>"><?php esc(elapsed($item->created_at)); ?></a></li>
+                            <li class="post_created_at"><a href="/<?php esc($item->author->username . '/status/' . $item->id); ?>"><?php esc(elapsed($item->created)); ?></a></li>
                         </ul>
                         <div class="post">
                             <?php //nl2br(esc($item->text)); ?>
                             <?php echo nl2br($item->text); ?>
-                        </div>
-                        <div class="media">
-                        <?php foreach($item->media as $media): ?>
-                            <?php if(isset($media->preview_image_url)): ?>
-                            <img src="<?php esc($media->preview_image_url); ?>" alt="Attachment" />
-                            <?php elseif(isset($media->url)): ?>
-                            <img src="<?php esc($media->url); ?>" alt="Attachment" />
+
+                            <div class="media">
+                            <?php foreach($item->media as $media): ?>
+                                <?php if(isset($media->preview_image_url)): ?>
+                                <img src="<?php esc($media->preview_image_url); ?>" alt="Attachment" />
+                                <?php elseif(isset($media->url)): ?>
+                                <img src="<?php esc($media->url); ?>" alt="Attachment" />
+                                <?php endif; ?>
+                            <?php endforeach; ?>
+                            </div>
+
+                            <?php if($item->quoted_tweet): ?>
+                                <div class="quoted">
+                                    <a href="/<?php esc($item->quoted_author->username); ?>"><img src="<?php esc($item->quoted_author->profile_image_url); ?>" alt="Profile Image" /></a>
+                                    <ul class="meta">
+                                        <li class="author_name"><a href="/<?php esc($item->quoted_author->username); ?>"><?php esc($item->quoted_author->name); ?></a></li>
+                                        <li class="author_username"><a href="/<?php esc($item->quoted_author->username); ?>">@<?php esc($item->quoted_author->username); ?></a></li>
+                                        <li class="post_created_at"><a href="/<?php esc($item->quoted_author->username . '/status/' . $item->quoted_id); ?>"><?php esc(elapsed($item->quoted_created)); ?></a></li>
+                                    </ul>
+                                    <div class="post">
+                                        <?php echo nl2br($item->quoted_text); ?>
+                                    </div>
+                                </div>
                             <?php endif; ?>
-                        <?php endforeach; ?>
                         </div>
                         <dl class="engagement">
                             <div>

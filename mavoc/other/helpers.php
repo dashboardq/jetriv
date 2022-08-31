@@ -18,7 +18,9 @@ if(!function_exists('classify')) {
 
 if(!function_exists('dashify')) {
     function dashify($input) {
-        $words = preg_replace('/[\s,-_]+/', ' ', strtolower($input));
+        // Add a space before uppercase letters (make sure the first letter is not uppercase).
+        $words = preg_replace('/(?=[A-Z])/', ' $0', lcfirst($input));
+        $words = preg_replace('/[\s,-_]+/', ' ', strtolower($words));
         $parts = explode(' ', $words);
         if(count($parts)) {
             $parts[0] = strtolower($parts[0]);
@@ -32,6 +34,7 @@ if(!function_exists('dashify')) {
 // https://stackoverflow.com/a/18602474
 // Slightly modified to accept DateTime objects.
 if(!function_exists('elapsed')) {
+    /*
     function elapsed($datetime, $full = false) {
         $now = new \DateTime;
         if(is_a($datetime, 'DateTime')) {
@@ -44,24 +47,22 @@ if(!function_exists('elapsed')) {
         $diff->w = floor($diff->d / 7);
         $diff->d -= $diff->w * 7;
 
-        /*
-        $string = array(
-            'y' => 'year',
-            'm' => 'month',
-            'w' => 'week',
-            'd' => 'day',
-            'h' => 'hour',
-            'i' => 'minute',
-            's' => 'second',
-        );
-        foreach ($string as $k => &$v) {
-            if ($diff->$k) {
-                $v = $diff->$k . ' ' . $v . ($diff->$k > 1 ? 's' : '');
-            } else {
-                unset($string[$k]);
-            }
-        }
-         */
+        //$string = array(
+            //'y' => 'year',
+            //'m' => 'month',
+            //'w' => 'week',
+            //'d' => 'day',
+            //'h' => 'hour',
+            //'i' => 'minute',
+            //'s' => 'second',
+        //);
+        //foreach ($string as $k => &$v) {
+            //if ($diff->$k) {
+                //$v = $diff->$k . ' ' . $v . ($diff->$k > 1 ? 's' : '');
+            //} else {
+                //unset($string[$k]);
+            //}
+        //}
         $string = array(
             'y' => 'y',
             'm' => 'm',
@@ -81,6 +82,39 @@ if(!function_exists('elapsed')) {
 
         if (!$full) $string = array_slice($string, 0, 1);
         return $string ? implode(', ', $string) . ' ago' : 'just now';
+    }
+     */
+    function elapsed($datetime, $full = false) {
+        $now = new \DateTime;
+        if(is_a($datetime, 'DateTime')) {
+            $ago = $datetime;
+        } else {
+            $ago = new \DateTime($datetime);
+        }
+        $diff = $now->diff($ago);
+
+        $output = '';
+        if($diff->y) {
+            $output = $diff->y . 'y ago';
+        } elseif($diff->m) {
+            $output = $diff->m . 'mo ago';
+        } elseif($diff->d) {
+            if($diff->d >= 7) {
+                $output = floor($diff->d/7) . 'w ago';
+            } else {
+                $output = $diff->d . 'd ago';
+            }
+        } elseif($diff->h) {
+            $output = $diff->h . 'h ago';
+        } elseif($diff->i) {
+            $output = $diff->i . 'm ago';
+        } elseif($diff->s) {
+            $output = $diff->s . 's ago';
+        } else {
+            $output = 'just now';
+        }
+
+        return $output;
     }
 }
 

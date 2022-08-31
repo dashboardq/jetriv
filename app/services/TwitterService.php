@@ -43,6 +43,7 @@ class TwitterService {
         $this->profile = Profile::find($this->user_settings->data['profile_id']);
         $this->connection = Connection::find($this->profile->data['connection_id']);
         $this->rest = new REST($this->connection->data['values']['access_token']);
+        //$this->rest = new REST('bad_token_test');
         $this->twitter_id = $this->profile->data['twitter_id'];
 
         $this->url_base = ao()->env('TWITTER_URL');
@@ -210,10 +211,15 @@ class TwitterService {
     public function get($url) {
         $url = $this->url_base . $url;
         $output = $this->rest->get($url);
+        //echo '<pre>'; print_r($output);die;
 
         if(isset($output->status) && $output->status == 401) {
+            //echo 'refresh';
+            //echo '<br>';
             $this->refresh();
             $output = $this->get($url);
+            //echo '<pre>'; print_r($output); echo '</pre>';
+            //die;
         }
         return $output;
     }
@@ -233,6 +239,7 @@ class TwitterService {
         $list = [];
 
         //echo '<pre>'; print_r($data); echo '</pre>';
+        //die;
 
         foreach($data->data ?? [] as $i => $item) {
             $list[] = $item;
@@ -269,10 +276,32 @@ class TwitterService {
                 }
             }
 
+            $list[$i]->retweeted_tweet = false;
+            $list[$i]->quoted_tweet = false;
             if(isset($item->referenced_tweets) && count($item->referenced_tweets)) {
                 if($item->referenced_tweets[0]->type == 'retweeted') {
+                    $list[$i]->id = $list[$i]->id;
+                    $list[$i]->retweeted_tweet = true;
+                    $list[$i]->retweeter = $list[$i]->author;
                     $list[$i]->author = $users[$tweets[$item->referenced_tweets[0]->id]->author_id];
                     $list[$i]->text = $tweets[$item->referenced_tweets[0]->id]->text;
+                } elseif($item->referenced_tweets[0]->type == 'quoted') {
+                    $quoted_tweet = $tweets[$item->referenced_tweets[0]->id];
+                    $list[$i]->quoted_tweet = true;
+                    $list[$i]->quoted_id = $quoted_tweet->id;
+                    $list[$i]->quoted_author = $users[$quoted_tweet->author_id];
+                    $list[$i]->quoted_created_at = $quoted_tweet->created_at;
+                    $list[$i]->quoted_created = new DateTime($list[$i]->quoted_created_at);
+                    $list[$i]->quoted_text = $quoted_tweet->text;
+                    $list[$i]->quoted_media = [];
+
+                    /* The media keys don't appear to end up in the media list
+                    if(isset($quoted_tweet->attachments->media_keys)) {
+                        foreach($quoted_tweet->attachments->media_keys as $j => $key) {
+                            $list[$i]->quoted_media[] = $media[$key];
+                        }
+                    }
+                     */
                 }
             }
         }
@@ -328,10 +357,32 @@ class TwitterService {
                 }
             }
 
+            $item->retweeted_tweet = false;
+            $item->quoted_tweet = false;
             if(isset($item->referenced_tweets) && count($item->referenced_tweets)) {
                 if($item->referenced_tweets[0]->type == 'retweeted') {
+                    $item->id = $tweets[$item->referenced_tweets[0]->id]->id;
+                    $item->retweeted_tweet = true;
+                    $item->retweeter = $item->author;
                     $item->author = $users[$tweets[$item->referenced_tweets[0]->id]->author_id];
                     $item->text = $tweets[$item->referenced_tweets[0]->id]->text;
+                } elseif($item->referenced_tweets[0]->type == 'quoted') {
+                    $quoted_tweet = $tweets[$item->referenced_tweets[0]->id];
+                    $item->quoted_tweet = true;
+                    $item->quoted_id = $quoted_tweet->id;
+                    $item->quoted_author = $users[$quoted_tweet->author_id];
+                    $item->quoted_created_at = $quoted_tweet->created_at;
+                    $item->quoted_created = new DateTime($item->quoted_created_at);
+                    $item->quoted_text = $quoted_tweet->text;
+                    $item->quoted_media = [];
+
+                    /* The media keys don't appear to end up in the media list
+                    if(isset($quoted_tweet->attachments->media_keys)) {
+                        foreach($quoted_tweet->attachments->media_keys as $j => $key) {
+                            $item->quoted_media[] = $media[$key];
+                        }
+                    }
+                     */
                 }
             }
 
@@ -456,7 +507,9 @@ class TwitterService {
 
     public function userTimeline($username, $pagination_token = '') {
         $response = $this->userLookup($username);
-        //echo '<pre>'; print_r($response); echo '</pre>'; die;
+        if(!isset($response->data)) {
+            throw new Exception('The page or user you are attempting to access does not appear to be available.', '/home');
+        }
 
         $url = '/2/users/' . $response->data->id . '/tweets';
         $url .= '?' . http_build_query($this->timeline_args);
