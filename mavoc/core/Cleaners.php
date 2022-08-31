@@ -16,10 +16,10 @@ class Cleaners {
         $this->{$name} = $method;
     }
 
-    public function exclaim($value) {
-        // If it doesn't end with an exclamation mark, add it.
-        if(!preg_match('/.*!$/', $value)) {
-            $value .= '!';
+    public function int($value) {
+        // If it is not an integer, set it to 0.
+        if(filter_var($value, FILTER_VALIDATE_INT) === false) {
+            return 0;
         }
 
         return $value;

@@ -64,6 +64,9 @@ class REST {
         }
 
         $response = curl_exec($ch);
+        //echo 'response: ';
+        //echo $response;
+        //echo '<br>';
         curl_close($ch);
 
         // TODO: Probably need to add some error checking for json_decode.

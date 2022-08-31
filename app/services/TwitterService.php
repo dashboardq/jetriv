@@ -132,13 +132,20 @@ class TwitterService {
         return $output;
     }
 
-    public function home($pagination_token = '') {
+    public function home($pagination_token = '', $replies = 0, $retweets = 0) {
         $twitter_id = $this->twitter_id;
 
         $url = '/2/users/' . $twitter_id . '/timelines/reverse_chronological';
         $url .= '?' . http_build_query($this->timeline_args);
         if($pagination_token) {
             $url .= '&' . http_build_query(['pagination_token' => $pagination_token]);
+        }
+        if(!$replies && !$retweets) {
+            $url .= '&' . http_build_query(['exclude' => 'replies,retweets']);
+        } elseif(!$replies) {
+            $url .= '&' . http_build_query(['exclude' => 'replies']);
+        } elseif(!$retweets) {
+            $url .= '&' . http_build_query(['exclude' => 'retweets']);
         }
 
         $data = $this->get($url);
@@ -216,7 +223,10 @@ class TwitterService {
         if(isset($output->status) && $output->status == 401) {
             //echo 'refresh';
             //echo '<br>';
+            //echo 'url: ' . $url;
+            //echo '<br>';
             $this->refresh();
+            //sleep(1);
             $output = $this->get($url);
             //echo '<pre>'; print_r($output); echo '</pre>';
             //die;

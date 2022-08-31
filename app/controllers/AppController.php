@@ -27,6 +27,9 @@ class AppController {
             'q' => ['sometimes'],
             'pagination_token' => ['sometimes'],
         ]);
+        
+        $user_setting = UserSetting::by('user_id', $req->user_id, 'data');
+
 
         $twitter = new TwitterService($req->user_id);
         if($query['q']) {
@@ -37,10 +40,10 @@ class AppController {
             $list = $twitter->tweets($ids);
              */
             $twitter = new TwitterService($req->user_id);
-            $list = $twitter->home($query['pagination_token']);
+            $list = $twitter->home($query['pagination_token'], $user_setting['home_replies'], $user_setting['home_retweets']);
         } else {
             $twitter = new TwitterService($req->user_id);
-            $list = $twitter->home($query['pagination_token']);
+            $list = $twitter->home($query['pagination_token'], $user_setting['home_replies'], $user_setting['home_retweets']);
         }
 
         $tweet_ids = [];
@@ -85,7 +88,26 @@ class AppController {
             }
         }
 
-        return compact('list', 'query', 'show_connect', 'title');
+        return compact('list', 'query', 'show_connect', 'title', 'user_setting');
+    }
+
+    public function homePost($req, $res) {
+        $val = $req->val($req->data, [
+            'replies' => ['sometimes'],
+            'retweets' => ['sometimes'],
+        ]);
+
+        $val = $req->clean($val, [
+            'replies' => ['int'],
+            'retweets' => ['int'],
+        ]);
+
+        $user_setting = UserSetting::by('user_id', $req->user_id);
+        $user_setting->data['home_replies'] = $val['replies'];
+        $user_setting->data['home_retweets'] = $val['retweets'];
+        $user_setting->save();
+
+        $res->redirect('/home');
     }
 
     public function bookmarks($req, $res) {

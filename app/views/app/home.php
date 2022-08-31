@@ -9,6 +9,11 @@
             <?php $res->partial('sidebar'); ?>
             <main>
                 <div class="box">
+                    <form class="settings" method="POST">
+                        <label><input type="checkbox" name="replies" value="1" <?php echo $user_setting['home_replies'] ? 'checked' : ''; ?> /> Show Replies</label>
+                        <label><input type="checkbox" name="retweets" value="1" <?php echo $user_setting['home_retweets'] ? 'checked' : ''; ?> /> Show Retweets</label>
+                        <input type="submit" value="Save" />
+                    </form>
                     <?php /*
                     <form class="search">
                         <input type="text" name="q" value="" placeholder="Search" />

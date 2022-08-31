@@ -17,6 +17,7 @@ Route::post('contact', ['ContactController', 'contactPost']);
 
 // Private
 Route::get('home', ['AppController', 'home'], 'private');
+Route::post('home', ['AppController', 'homePost'], 'private');
 Route::get('bookmarks', ['AppController', 'bookmarks'], 'private');
 Route::get('notifications', ['AppController', 'notifications'], 'private');
 Route::get('todo', ['AppController', 'todo'], 'private');

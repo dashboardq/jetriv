@@ -435,6 +435,24 @@ article button[aria-label=Close] {
     font-size: 14px;
 }
 
+.settings {
+    position: absolute;
+    top: -44px;
+    left: 96px;
+    left: 174px;
+    left: 133px;
+}
+.settings label {
+    display: inline-block;
+    margin-right: 2rem;
+}
+.settings input[type=submit] {
+    padding: .5rem;
+    padding: 7px;
+    font-size: 14px;
+}
+
+
 .bookmark_details {
     display: none;
     margin-top: 1rem;
